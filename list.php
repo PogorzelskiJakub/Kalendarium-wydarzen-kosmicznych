@@ -2,10 +2,23 @@
 require("session.php");
 require("db.php");
 
-$sql = "SELECT nazwa, kategoria, opis FROM wydarzenia";
+// Inicjalizacja zmiennej na nazwę do wyszukiwania
+$searchTerm = "";
+
+// Sprawdzenie czy formularz wyszukiwania został wysłany
+if(isset($_GET['search'])) {
+    $searchTerm = $_GET['search'];
+
+    // Pobierz wydarzenia z bazy danych na podstawie wyszukiwanej nazwy
+    $sql = "SELECT nazwa, kategoria, opis FROM wydarzenia WHERE nazwa LIKE '%$searchTerm%'";
+} else {
+    // Pobierz wszystkie wydarzenia, jeśli formularz nie został wysłany
+    $sql = "SELECT nazwa, kategoria, opis FROM wydarzenia";
+}
+
 $result = $conn->query($sql);
 
-//zmienna która będzie przechowywać listę wydarzeń
+// Inicjalizacja zmiennej, która będzie przechowywać listę wydarzeń
 $events = [];
 
 if ($result->num_rows > 0) {
@@ -31,12 +44,21 @@ if ($result->num_rows > 0) {
             padding: 8px;
             text-align: left;
         }
+        .search-form {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <?php include 'menu.php'; ?>
     
     <h2>Lista Wydarzeń Kosmicznych</h2>
+    
+    <form action="list.php" method="GET" class="search-form">
+        <label for="search">Wyszukaj wydarzenie:</label>
+        <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        <button type="submit">Szukaj</button>
+    </form>
     
     <table>
         <thead>
@@ -60,5 +82,6 @@ if ($result->num_rows > 0) {
 </html>
 
 <?php
+// Zamknij połączenie z bazą danych
 $conn->close();
 ?>
