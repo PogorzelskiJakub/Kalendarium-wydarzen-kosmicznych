@@ -6,7 +6,7 @@ require("db.php");
     <a href="index.php">Kalendarz</a>
     <a href="list.php">Lista</a>
     <?php if(isset($_SESSION["login"])): ?>
-        <a href="mySuggestions.php">Moje propozycje</a>
+        <a href="waiting.php">Moje propozycje</a>
         <a href="logout.php">Wyloguj</a>
     <?php else: ?>
         <a href="login.php">Zaloguj</a>
