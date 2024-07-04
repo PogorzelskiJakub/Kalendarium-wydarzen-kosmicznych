@@ -6,6 +6,7 @@ require("db.php");
 $searchTerm = "";
 $category = "";
 $order = "data"; // Domyślne sortowanie według daty
+$onlyFollowed = false;
 
 // Obsługa formularza wyszukiwania
 if(isset($_GET['search'])) {
@@ -13,6 +14,11 @@ if(isset($_GET['search'])) {
 }
 if(isset($_GET['category'])) {
     $category = $_GET['category'];
+}
+
+// Obsługa przycisku do przełączania wyświetlania obserwowanych wydarzeń
+if(isset($_GET['only_followed'])) {
+    $onlyFollowed = ($_GET['only_followed'] == '1') ? true : false;
 }
 
 // Zapytanie SQL bazujące na wybranej kategorii i wprowadzonej nazwie, sortowanie po dacie
@@ -26,6 +32,12 @@ if (!empty($searchTerm)) {
 // Dodanie warunku na kategorię
 if (!empty($category)) {
     $sql .= " AND kategoria = '$category'";
+}
+
+// Dodanie warunku na obserwowane wydarzenia
+if ($onlyFollowed) {
+    $idUzytkownika = $_SESSION["id"];
+    $sql .= " AND id IN (SELECT idWydarzenia FROM obserwowane WHERE idUzytkownika = $idUzytkownika)";
 }
 
 // Dodanie sortowania po dacie
@@ -88,6 +100,15 @@ if ($result->num_rows > 0) {
         </select>
         
         <button type="submit">Szukaj</button>
+        
+        <?php
+        // Przycisk do przełączania wyświetlania obserwowanych wydarzeń
+        $onlyFollowedText = $onlyFollowed ? "Pokaż wszystkie wydarzenia" : "Pokaż tylko obserwowane";
+        $onlyFollowedValue = $onlyFollowed ? "0" : "1";
+        ?>
+        <a href="list.php?search=<?php echo urlencode($searchTerm); ?>&category=<?php echo urlencode($category); ?>&only_followed=<?php echo $onlyFollowedValue; ?>">
+            <button type="button"><?php echo $onlyFollowedText; ?></button>
+        </a>
     </form>
     
     <table>
@@ -109,10 +130,10 @@ if ($result->num_rows > 0) {
                     <td><?php echo htmlspecialchars($event['opis']); ?></td>
                     <td>
                         <?php
-                        $id=$event["id"];
+                        $id = $event["id"];
                         $idUzytkownika = $_SESSION["id"];
-                        $sql = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
-                        $added = $conn->query($sql)->num_rows > 0;
+                        $sql_follow = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
+                        $added = $conn->query($sql_follow)->num_rows > 0;
                         $text = $added ? "Usuń z obserwowanych" : "Dodaj do obserwowanych";
                         echo "<p class='follow' data-wydarzenie='$id'>$text</p>";
                         ?>
