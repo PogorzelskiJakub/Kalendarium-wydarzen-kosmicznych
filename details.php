@@ -103,6 +103,7 @@ $result_photos = $conn->query($sql_photos);
         }
         .photo {
             position: relative;
+            cursor: pointer;
         }
         .photo img {
             width: 100%;
@@ -120,6 +121,44 @@ $result_photos = $conn->query($sql_photos);
             margin-top: 20px;
             border: 1px solid #ccc;
             padding: 10px;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -148,7 +187,7 @@ $result_photos = $conn->query($sql_photos);
             <h2>Galeria Zdjęć</h2>
             <div class="gallery">
                 <?php while ($photo = $result_photos->fetch_assoc()): ?>
-                    <div class="photo">
+                    <div class="photo" onclick="openModal(this)">
                         <img src="zdjęcia/<?php echo htmlspecialchars($photo['obraz']); ?>" alt="Zdjęcie">
                         <div class="author">Dodane przez: <?php echo htmlspecialchars($photo['login']); ?></div>
                     </div>
@@ -156,6 +195,26 @@ $result_photos = $conn->query($sql_photos);
             </div>
         </div>
     </div>
+
+    <!-- Modal for displaying full-size image -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content" id="img01"></div>
+    </div>
+
+    <script>
+        function openModal(element) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("img01");
+            modal.style.display = "block";
+            modalImg.innerHTML = element.innerHTML;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+    </script>
 </body>
 </html>
 
