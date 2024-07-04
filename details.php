@@ -10,6 +10,36 @@ if (!isset($_GET['id'])) {
 
 $id = $_GET['id'];
 
+// Obsługa przesyłania zdjęć użytkownika
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
+    $image = $_FILES["image"];
+    $userId = $_SESSION["id"];
+
+    // Sprawdzenie czy plik jest obrazem
+    $check = getimagesize($image["tmp_name"]);
+    if ($check !== false) {
+        $fileName = uniqid() . "_" . basename($image["name"]);
+        $uploadDir = "zdjęcia/";
+        $targetFilePath = $uploadDir . $fileName;
+
+        // Przeniesienie pliku do katalogu zdjęcia
+        if (move_uploaded_file($image["tmp_name"], $targetFilePath)) {
+            // Zapisanie informacji o zdjęciu do bazy danych (tylko nazwa pliku)
+            $sql_insert = "INSERT INTO obrazy (obraz, idWydarzenia, idUzytkownika) VALUES ('$fileName', $id, $userId)";
+            if ($conn->query($sql_insert) === TRUE) {
+                header("Location: details.php?id=$id");
+                exit();
+            } else {
+                echo "Błąd podczas zapisywania zdjęcia do bazy danych.";
+            }
+        } else {
+            echo "Wystąpił problem podczas przesyłania zdjęcia.";
+        }
+    } else {
+        echo "Przesłany plik nie jest obrazem.";
+    }
+}
+
 // Zapytanie SQL, aby pobrać szczegółowe informacje o wydarzeniu
 $sql_event = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE id = $id";
 $result_event = $conn->query($sql_event);
@@ -86,6 +116,11 @@ $result_photos = $conn->query($sql_photos);
             padding: 5px;
             font-size: 12px;
         }
+        .upload-form {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -100,13 +135,21 @@ $result_photos = $conn->query($sql_photos);
             <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
             <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
             
+            <!-- Formularz do przesyłania zdjęć -->
+            <div class="upload-form">
+                <h3>Udostępnij swoje zdjęcie</h3>
+                <form action="details.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
+                    <input type="file" name="image" required>
+                    <button type="submit">Prześlij</button>
+                </form>
+            </div>
         </div>
         <div class="main-content">
             <h2>Galeria Zdjęć</h2>
             <div class="gallery">
                 <?php while ($photo = $result_photos->fetch_assoc()): ?>
                     <div class="photo">
-                        <img src="<?php echo htmlspecialchars($photo['obraz']); ?>" alt="Zdjęcie">
+                        <img src="zdjęcia/<?php echo htmlspecialchars($photo['obraz']); ?>" alt="Zdjęcie">
                         <div class="author">Dodane przez: <?php echo htmlspecialchars($photo['login']); ?></div>
                     </div>
                 <?php endwhile; ?>
