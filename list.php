@@ -2,23 +2,35 @@
 require("session.php");
 require("db.php");
 
-// Inicjalizacja zmiennej na nazwę do wyszukiwania
 $searchTerm = "";
+$category = "";
 
-// Sprawdzenie czy formularz wyszukiwania został wysłany
 if(isset($_GET['search'])) {
     $searchTerm = $_GET['search'];
+}
+if(isset($_GET['category'])) {
+    $category = $_GET['category'];
+}
 
-    // Pobierz wydarzenia z bazy danych na podstawie wyszukiwanej nazwy
-    $sql = "SELECT nazwa, kategoria, opis FROM wydarzenia WHERE nazwa LIKE '%$searchTerm%'";
-} else {
-    // Pobierz wszystkie wydarzenia, jeśli formularz nie został wysłany
-    $sql = "SELECT nazwa, kategoria, opis FROM wydarzenia";
+// Zapytanie SQL bazujące na wybranej kategorii i wprowadzonej nazwie
+$sql = "SELECT nazwa, kategoria, opis FROM wydarzenia WHERE 1=1";
+
+// Dodanie warunku na nazwę
+if (!empty($searchTerm)) {
+    $sql .= " AND nazwa LIKE '%$searchTerm%'";
+}
+
+// Dodanie warunku na kategorię
+if (!empty($category)) {
+    $sql .= " AND kategoria = '$category'";
 }
 
 $result = $conn->query($sql);
 
-// Inicjalizacja zmiennej, która będzie przechowywać listę wydarzeń
+// Pobranie listy unikalnych kategorii
+$sql_categories = "SELECT DISTINCT kategoria FROM wydarzenia";
+$result_categories = $conn->query($sql_categories);
+
 $events = [];
 
 if ($result->num_rows > 0) {
@@ -57,6 +69,17 @@ if ($result->num_rows > 0) {
     <form action="list.php" method="GET" class="search-form">
         <label for="search">Wyszukaj wydarzenie:</label>
         <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>">
+        
+        <label for="category">Kategoria:</label>
+        <select id="category" name="category">
+            <option value="">Wybierz kategorię</option>
+            <?php while ($row_category = $result_categories->fetch_assoc()): ?>
+                <option value="<?php echo htmlspecialchars($row_category['kategoria']); ?>" <?php if ($category == $row_category['kategoria']) echo "selected"; ?>>
+                    <?php echo htmlspecialchars($row_category['kategoria']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+        
         <button type="submit">Szukaj</button>
     </form>
     
@@ -82,6 +105,5 @@ if ($result->num_rows > 0) {
 </html>
 
 <?php
-// Zamknij połączenie z bazą danych
 $conn->close();
 ?>
