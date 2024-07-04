@@ -16,7 +16,7 @@ if(isset($_GET['category'])) {
 }
 
 // Zapytanie SQL bazujące na wybranej kategorii i wprowadzonej nazwie, sortowanie po dacie
-$sql = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE 1=1";
+$sql = "SELECT id, nazwa, kategoria, data, opis FROM wydarzenia WHERE 1=1";
 
 // Dodanie warunku na nazwę
 if (!empty($searchTerm)) {
@@ -97,6 +97,7 @@ if ($result->num_rows > 0) {
                 <th>Kategoria</th>
                 <th>Data</th>
                 <th>Opis</th>
+                <th>Akcja</th>
             </tr>
         </thead>
         <tbody>
@@ -106,14 +107,25 @@ if ($result->num_rows > 0) {
                     <td><?php echo htmlspecialchars($event['kategoria']); ?></td>
                     <td><?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></td>
                     <td><?php echo htmlspecialchars($event['opis']); ?></td>
+                    <td>
+                        <?php
+                        $id=$event["id"];
+                        $idUzytkownika = $_SESSION["id"];
+                        $sql = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
+                        $added = $conn->query($sql)->num_rows > 0;
+                        $text = $added ? "Usuń z obserwowanych" : "Dodaj do obserwowanych";
+                        echo "<p class='follow' data-wydarzenie='$id'>$text</p>";
+                        ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
 
 <?php
-// Zamknij połączenie z bazą danych
-$conn->close();
 ?>
