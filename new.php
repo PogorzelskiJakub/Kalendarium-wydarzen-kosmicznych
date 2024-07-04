@@ -88,9 +88,6 @@ $conn->close();
             <a href="denied.php">Odrzucone</a>
             <a href="new.php">Dodaj nową</a>
         </div>
-        <div>
-            <a href="logout.php">Wyloguj</a>
-        </div>
     </div>
 
     <div class="form-container">

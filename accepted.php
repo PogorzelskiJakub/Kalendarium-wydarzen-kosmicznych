@@ -62,9 +62,6 @@ if ($result->num_rows > 0) {
             <a href="denied.php">Odrzucone</a>
             <a href="new.php">Dodaj nową</a>
         </div>
-        <div>
-            <a href="logout.php">Wyloguj</a>
-        </div>
     </div>
 
     <h2>Zaakceptowane Sugestie</h2>
