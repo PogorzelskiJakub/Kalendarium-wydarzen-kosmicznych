@@ -27,6 +27,8 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
+    <?php include('menu.php'); ?>
+
     <h1>Lista Wydarzeń</h1>
     <table>
         <thead>
