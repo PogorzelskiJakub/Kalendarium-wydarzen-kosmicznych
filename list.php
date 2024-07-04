@@ -123,7 +123,7 @@ if ($result->num_rows > 0) {
         </thead>
         <tbody>
             <?php foreach ($events as $event): ?>
-                <tr>
+                <tr onclick="window.location.href='details.php?id=<?php echo $event['id']; ?>'">
                     <td><?php echo htmlspecialchars($event['nazwa']); ?></td>
                     <td><?php echo htmlspecialchars($event['kategoria']); ?></td>
                     <td><?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></td>
