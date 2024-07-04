@@ -2,9 +2,12 @@
 require("session.php");
 require("db.php");
 
+// Inicjalizacja zmiennych na nazwę do wyszukiwania, kategorię do filtrowania i sortowanie
 $searchTerm = "";
 $category = "";
+$order = "data"; // Domyślne sortowanie według daty
 
+// Obsługa formularza wyszukiwania
 if(isset($_GET['search'])) {
     $searchTerm = $_GET['search'];
 }
@@ -12,8 +15,8 @@ if(isset($_GET['category'])) {
     $category = $_GET['category'];
 }
 
-// Zapytanie SQL bazujące na wybranej kategorii i wprowadzonej nazwie
-$sql = "SELECT nazwa, kategoria, opis FROM wydarzenia WHERE 1=1";
+// Zapytanie SQL bazujące na wybranej kategorii i wprowadzonej nazwie, sortowanie po dacie
+$sql = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE 1=1";
 
 // Dodanie warunku na nazwę
 if (!empty($searchTerm)) {
@@ -25,12 +28,16 @@ if (!empty($category)) {
     $sql .= " AND kategoria = '$category'";
 }
 
+// Dodanie sortowania po dacie
+$sql .= " ORDER BY $order";
+
 $result = $conn->query($sql);
 
 // Pobranie listy unikalnych kategorii
 $sql_categories = "SELECT DISTINCT kategoria FROM wydarzenia";
 $result_categories = $conn->query($sql_categories);
 
+// Inicjalizacja zmiennej, która będzie przechowywać listę wydarzeń
 $events = [];
 
 if ($result->num_rows > 0) {
@@ -88,15 +95,17 @@ if ($result->num_rows > 0) {
             <tr>
                 <th>Nazwa</th>
                 <th>Kategoria</th>
+                <th>Data</th>
                 <th>Opis</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($events as $event): ?>
                 <tr>
-                    <td><?php echo $event['nazwa']; ?></td>
-                    <td><?php echo $event['kategoria']; ?></td>
-                    <td><?php echo $event['opis']; ?></td>
+                    <td><?php echo htmlspecialchars($event['nazwa']); ?></td>
+                    <td><?php echo htmlspecialchars($event['kategoria']); ?></td>
+                    <td><?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></td>
+                    <td><?php echo htmlspecialchars($event['opis']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -105,5 +114,6 @@ if ($result->num_rows > 0) {
 </html>
 
 <?php
+// Zamknij połączenie z bazą danych
 $conn->close();
 ?>
