@@ -167,12 +167,37 @@ $result_photos = $conn->query($sql_photos);
     
     <div class="container">
         <div class="sidebar">
+            
             <h2>Informacje o wydarzeniu</h2>
             <p><strong>Nazwa:</strong> <?php echo htmlspecialchars($event['nazwa']); ?></p>
             <p><strong>Kategoria:</strong> <?php echo htmlspecialchars($event['kategoria']); ?></p>
             <p><strong>Data:</strong> <?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></p>
             <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
             <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
+    
+            <!-- Przyciski do dodawania i usuwania z obserwowanych -->
+            <?php if (isset($_SESSION['id'])): ?>
+            <?php
+                $idUzytkownika = $_SESSION['id'];
+                $sql_check_follow = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
+                $result_check_follow = $conn->query($sql_check_follow);
+                $is_following = $result_check_follow->num_rows > 0;
+            ?>
+
+            <?php if ($is_following): ?>
+                <form action="unfollow.php" method="POST">
+                    <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                    <button type="submit">Usuń z obserwowanych</button>
+                </form>
+                    <?php else: ?>
+                    <form action="follow.php" method="POST">
+                        <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                        <button type="submit">Dodaj do obserwowanych</button>
+                    </form>
+                <?php endif; ?>
+            <?php endif; ?>
+
+
             
             <!-- Formularz do przesyłania zdjęć -->
             <div class="upload-form">
