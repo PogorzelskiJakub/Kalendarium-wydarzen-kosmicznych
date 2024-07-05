@@ -10,33 +10,8 @@ require("db.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalendarz Wydarzeń Kosmicznych</title>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" href="styles.css">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .menu {
-            display: flex;
-            justify-content: space-between;
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        .menu a {
-            text-decoration: none;
-            color: black;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .menu a:hover {
-            background-color: #ddd;
-        }
-        #calendar {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 <body>
     <?php include 'menu.php'; ?>

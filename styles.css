@@ -1,0 +1,45 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f9fc;
+    color: #333;
+}
+
+.menu {
+    background-color: #343a40;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.menu ul li {
+    margin: 0;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+}
+
+.menu ul li a:hover {
+    background-color: #495057;
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
