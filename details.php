@@ -2,67 +2,24 @@
 require("session.php");
 require("db.php");
 
-// Sprawdzenie, czy przekazano identyfikator wydarzenia
-if (!isset($_GET['id'])) {
-    header("Location: list.php");
-    exit();
-}
+$idWydarzenia = $_GET['id'];
+$idUzytkownika = $_SESSION['id'];
 
-$id = $_GET['id'];
+// Pobranie szczegółów wydarzenia
+$sql = "SELECT * FROM wydarzenia WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $idWydarzenia);
+$stmt->execute();
+$result = $stmt->get_result();
+$event = $result->fetch_assoc();
 
-// Obsługa przesyłania zdjęć użytkownika
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
-    $image = $_FILES["image"];
-    $userId = $_SESSION["id"];
+// Sprawdzenie, czy wydarzenie jest obserwowane
+$sql_followed = "SELECT id FROM obserwowane WHERE idWydarzenia = ? AND idUzytkownika = ?";
+$stmt_followed = $conn->prepare($sql_followed);
+$stmt_followed->bind_param("ii", $idWydarzenia, $idUzytkownika);
+$stmt_followed->execute();
+$isFollowed = $stmt_followed->get_result()->num_rows > 0;
 
-    // Sprawdzenie czy plik jest obrazem
-    $check = getimagesize($image["tmp_name"]);
-    if ($check !== false) {
-        $fileName = uniqid() . "_" . basename($image["name"]);
-        $uploadDir = "zdjęcia/";
-        $targetFilePath = $uploadDir . $fileName;
-
-        // Przeniesienie pliku do katalogu zdjęcia
-        if (move_uploaded_file($image["tmp_name"], $targetFilePath)) {
-            // Zapisanie informacji o zdjęciu do bazy danych (tylko nazwa pliku)
-            $sql_insert = "INSERT INTO obrazy (obraz, idWydarzenia, idUzytkownika) VALUES ('$fileName', $id, $userId)";
-            if ($conn->query($sql_insert) === TRUE) {
-                header("Location: details.php?id=$id");
-                exit();
-            } else {
-                echo "Błąd podczas zapisywania zdjęcia do bazy danych.";
-            }
-        } else {
-            echo "Wystąpił problem podczas przesyłania zdjęcia.";
-        }
-    } else {
-        echo "Przesłany plik nie jest obrazem.";
-    }
-}
-
-// Zapytanie SQL, aby pobrać szczegółowe informacje o wydarzeniu
-$sql_event = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE id = $id";
-$result_event = $conn->query($sql_event);
-
-if ($result_event->num_rows > 0) {
-    $event = $result_event->fetch_assoc();
-
-    // Zapytanie SQL, aby pobrać ilość obserwujących to wydarzenie
-    $sql_followers = "SELECT COUNT(*) AS count FROM obserwowane WHERE idWydarzenia = $id";
-    $result_followers = $conn->query($sql_followers);
-    $followers_count = $result_followers->fetch_assoc()['count'];
-} else {
-    // Przekierowanie, jeśli wydarzenie o podanym identyfikatorze nie istnieje
-    header("Location: list.php");
-    exit();
-}
-
-// Zapytanie SQL, aby pobrać galerię zdjęć z informacją o użytkowniku
-$sql_photos = "SELECT obrazy.id, obrazy.obraz, uzytkownicy.login 
-               FROM obrazy 
-               LEFT JOIN uzytkownicy ON obrazy.idUzytkownika = uzytkownicy.id 
-               WHERE obrazy.idWydarzenia = $id";
-$result_photos = $conn->query($sql_photos);
 ?>
 
 <!DOCTYPE html>
@@ -71,153 +28,159 @@ $result_photos = $conn->query($sql_photos);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Szczegóły Wydarzenia</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            width: 80%;
-            display: flex;
-            justify-content: space-between;
-        }
-        .sidebar {
-            flex-basis: 30%;
-        }
-        .main-content {
-            flex-basis: 60%;
         }
         .menu {
-            width: 100%;
+            display: flex;
+            justify-content: space-between;
             background-color: #f0f0f0;
             padding: 10px;
             margin-bottom: 20px;
-            text-align: center;
+        }
+        .menu a {
+            text-decoration: none;
+            color: black;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .menu a:hover {
+            background-color: #ddd;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .details {
+            flex: 1;
+            margin-right: 20px;
         }
         .gallery {
+            flex: 2;
+        }
+        .image-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
         }
-        .photo {
-            position: relative;
-            cursor: pointer;
-        }
-        .photo img {
+        .image-grid img {
             width: 100%;
             height: auto;
-        }
-        .photo .author {
-            position: absolute;
-            bottom: 5px;
-            left: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 5px;
-            font-size: 12px;
-        }
-        .upload-form {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.9);
-        }
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-        }
-        .modal-content img {
-            width: 100%;
-            height: auto;
-        }
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 35px;
-            color: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
             cursor: pointer;
         }
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
+        .image-grid .caption {
+            text-align: center;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <?php include 'menu.php'; ?>
-    
-    <div class="container">
-        <div class="sidebar">
-            <h2>Informacje o wydarzeniu</h2>
-            <p><strong>Nazwa:</strong> <?php echo htmlspecialchars($event['nazwa']); ?></p>
-            <p><strong>Kategoria:</strong> <?php echo htmlspecialchars($event['kategoria']); ?></p>
-            <p><strong>Data:</strong> <?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></p>
-            <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
-            <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
-            
-            <!-- Formularz do przesyłania zdjęć -->
-            <div class="upload-form">
-                <h3>Udostępnij swoje zdjęcie</h3>
-                <form action="details.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
-                    <input type="file" name="image" required>
-                    <button type="submit">Prześlij</button>
-                </form>
-            </div>
-        </div>
-        <div class="main-content">
-            <h2>Galeria Zdjęć</h2>
-            <div class="gallery">
-                <?php while ($photo = $result_photos->fetch_assoc()): ?>
-                    <div class="photo" onclick="openModal(this)">
-                        <img src="zdjęcia/<?php echo htmlspecialchars($photo['obraz']); ?>" alt="Zdjęcie">
-                        <div class="author">Dodane przez: <?php echo htmlspecialchars($photo['login']); ?></div>
-                    </div>
-                <?php endwhile; ?>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal for displaying full-size image -->
-    <div id="myModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div class="modal-content" id="img01"></div>
+    <div class="container">
+        <div class="details">
+            <h2><?php echo htmlspecialchars($event['nazwa']); ?></h2>
+            <p><strong>Kategoria:</strong> <?php echo htmlspecialchars($event['kategoria']); ?></p>
+            <p><strong>Data:</strong> <?php echo htmlspecialchars($event['data']); ?></p>
+            <p><strong>Opis:</strong> <?php echo nl2br(htmlspecialchars($event['opis'])); ?></p>
+            <p><strong>Obserwujących:</strong> 
+                <?php
+                $sql_followers = "SELECT COUNT(*) as count FROM obserwowane WHERE idWydarzenia = ?";
+                $stmt_followers = $conn->prepare($sql_followers);
+                $stmt_followers->bind_param("i", $idWydarzenia);
+                $stmt_followers->execute();
+                $result_followers = $stmt_followers->get_result()->fetch_assoc();
+                echo $result_followers['count'];
+                ?>
+            </p>
+            <button id="follow-btn" data-followed="<?php echo $isFollowed ? '1' : '0'; ?>">
+                <?php echo $isFollowed ? 'Usuń z obserwowanych' : 'Dodaj do obserwowanych'; ?>
+            </button>
+
+            <h3>Dodaj nowe zdjęcie:</h3>
+            <form action="upload_image.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="idWydarzenia" value="<?php echo $idWydarzenia; ?>">
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit">Prześlij</button>
+            </form>
+        </div>
+
+        <div class="gallery">
+            <h3>Galeria zdjęć</h3>
+            <div class="image-grid">
+                <?php
+                $sql_images = "SELECT obraz, idUzytkownika FROM obrazy WHERE idWydarzenia = ?";
+                $stmt_images = $conn->prepare($sql_images);
+                $stmt_images->bind_param("i", $idWydarzenia);
+                $stmt_images->execute();
+                $result_images = $stmt_images->get_result();
+                while($image = $result_images->fetch_assoc()) {
+                    echo '<div>';
+                    echo '<img src="zdjecia/' . htmlspecialchars($image['obraz']) . '" alt="Zdjęcie" onclick="toggleImage(this)">';
+                    echo '<div class="caption">dodane przez: ' . htmlspecialchars($image['idUzytkownika']) . '</div>';
+                    echo '</div>';
+                }
+                ?>
+            </div>
+        </div>
     </div>
 
     <script>
-        function openModal(element) {
-            var modal = document.getElementById("myModal");
-            var modalImg = document.getElementById("img01");
-            modal.style.display = "block";
-            modalImg.innerHTML = element.innerHTML;
-        }
+        document.getElementById('follow-btn').addEventListener('click', function() {
+            var btn = this;
+            var followed = btn.getAttribute('data-followed') === '1';
+            var action = followed ? 'unfollow_event.php' : 'follow_event.php';
+            var idWydarzenia = <?php echo $idWydarzenia; ?>;
+            
+            fetch(action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'idWydarzenia=' + idWydarzenia
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === 'success') {
+                    btn.textContent = followed ? 'Dodaj do obserwowanych' : 'Usuń z obserwowanych';
+                    btn.setAttribute('data-followed', followed ? '0' : '1');
+                } else {
+                    alert('Wystąpił błąd. Spróbuj ponownie później.');
+                }
+            });
+        });
 
-        function closeModal() {
-            var modal = document.getElementById("myModal");
-            modal.style.display = "none";
+        function toggleImage(img) {
+            if (img.classList.contains('fullscreen')) {
+                img.classList.remove('fullscreen');
+                document.body.style.overflow = 'auto';
+            } else {
+                img.classList.add('fullscreen');
+                document.body.style.overflow = 'hidden';
+            }
         }
     </script>
+    <style>
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .fullscreen img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+    </style>
 </body>
 </html>
-
-<?php
-$conn->close();
-?>
