@@ -1,3 +1,8 @@
+<?php
+require("session.php");
+require("db.php");
+?>
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -43,7 +48,10 @@
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                events: 'fetch_events.php'
+                events: 'fetch_events.php',
+                eventClick: function(info) {
+                    window.location.href = 'details.php?id=' + info.event.id;
+                }
             });
             calendar.render();
         });
