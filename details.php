@@ -2,6 +2,18 @@
 require("session.php");
 require("db.php");
 
+// Sprawdzenie czy użytkownik jest zalogowany i jaka jest jego rola
+$rola = "";
+if(isset($_SESSION["login"])) {
+    $idUzytkownika = $_SESSION["id"];
+    $sql = "SELECT rola FROM uzytkownicy WHERE id = $idUzytkownika";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $rola = $row['rola'];
+    }
+}
+
 // Sprawdzenie, czy przekazano identyfikator wydarzenia
 if (!isset($_GET['id'])) {
     header("Location: list.php");
@@ -167,14 +179,13 @@ $result_photos = $conn->query($sql_photos);
     
     <div class="container">
         <div class="sidebar">
-            
             <h2>Informacje o wydarzeniu</h2>
             <p><strong>Nazwa:</strong> <?php echo htmlspecialchars($event['nazwa']); ?></p>
             <p><strong>Kategoria:</strong> <?php echo htmlspecialchars($event['kategoria']); ?></p>
             <p><strong>Data:</strong> <?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></p>
             <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
             <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
-    
+            
             <!-- Przyciski do dodawania i usuwania z obserwowanych -->
             <?php if (isset($_SESSION['id'])): ?>
             <?php
@@ -197,8 +208,6 @@ $result_photos = $conn->query($sql_photos);
                 <?php endif; ?>
             <?php endif; ?>
 
-
-            
             <!-- Formularz do przesyłania zdjęć -->
             <div class="upload-form">
                 <h3>Udostępnij swoje zdjęcie</h3>
@@ -207,6 +216,15 @@ $result_photos = $conn->query($sql_photos);
                     <button type="submit">Prześlij</button>
                 </form>
             </div>
+
+            <!-- Przycisk do usuwania wydarzenia dla admina -->
+            <?php if ($rola === 'admin'): ?>
+                <form action="delete_event.php" method="POST">
+                    <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                    <button type="submit">Usuń to wydarzenie</button>
+                </form>
+                <a href="edit_event.php?id=<?php echo $id; ?>">Edytuj to wydarzenie</a>
+            <?php endif; ?>
         </div>
         <div class="main-content">
             <h2>Galeria Zdjęć</h2>
