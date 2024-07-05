@@ -23,6 +23,60 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     margin-right: 20px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+
+.sidebar h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+.sidebar p {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.sidebar p strong {
+    display: block;
+    font-weight: bold;
+    color: #333;
+}
+
+.sidebar form,
+.sidebar .upload-form {
+    margin-bottom: 20px;
+}
+
+.sidebar .upload-form h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.sidebar button,
+.sidebar a.button {
+    width: auto;
+    text-align: center;
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 0.9em; 
+    padding: 8px 16px;
+}
+
+.sidebar .followers {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.sidebar .info {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    background-color: #f7f9fc;
+    border-radius: 5px;
 }
 
 .main-content {
@@ -39,6 +93,7 @@ body {
     text-decoration: none;
     display: inline-block;
     margin-top: 10px;
+    font-size: 1em; /* Dodano dla zachowania jednolitości rozmiaru tekstu */
 }
 
 .button:hover {

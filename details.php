@@ -81,53 +81,53 @@ $result_photos = $conn->query($sql_photos);
     <?php include 'menu.php'; ?>
     
     <div class="container">
-        <div class="sidebar">
-            <h2>Informacje o wydarzeniu</h2>
+    <div class="sidebar">
+        <h2>Informacje o wydarzeniu</h2>
+        <div class="info">
             <p><strong>Nazwa:</strong> <?php echo htmlspecialchars($event['nazwa']); ?></p>
             <p><strong>Kategoria:</strong> <?php echo htmlspecialchars($event['kategoria']); ?></p>
             <p><strong>Data:</strong> <?php echo isset($event['data']) ? htmlspecialchars($event['data']) : ''; ?></p>
             <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
-            <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
-            
-            <?php if (isset($_SESSION['id'])): ?>
-            <?php
-                $idUzytkownika = $_SESSION['id'];
-                $sql_check_follow = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
-                $result_check_follow = $conn->query($sql_check_follow);
-                $is_following = $result_check_follow->num_rows > 0;
-            ?>
-
-            <?php if ($is_following): ?>
-                <form action="unfollow.php" method="POST">
-                    <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
-                    <button type="submit">Usuń z obserwowanych</button>
-                </form>
-                    <?php else: ?>
-                    <form action="follow.php" method="POST">
-                        <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
-                        <button type="submit">Dodaj do obserwowanych</button>
-                    </form>
-                <?php endif; ?>
-            <?php endif; ?>
-
-            <!-- Formularz do przesyłania zdjęć -->
-            <div class="upload-form">
-                <h3>Udostępnij swoje zdjęcie</h3>
-                <form action="details.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
-                    <input type="file" name="image" required>
-                    <button type="submit">Prześlij</button>
-                </form>
-            </div>
-
-            <!-- Przycisk do usuwania wydarzenia dla admina -->
-            <?php if ($rola === 'admin'): ?>
-                <form action="delete_event.php" method="POST">
-                    <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
-                    <button type="submit">Usuń to wydarzenie</button>
-                </form>
-                <a href="edit_event.php?id=<?php echo $id; ?>" class="button">Edytuj to wydarzenie</a>
-            <?php endif; ?>
+            <p class="followers"><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
         </div>
+    
+        <?php if (isset($_SESSION['id'])): ?>
+        <?php
+            $idUzytkownika = $_SESSION['id'];
+            $sql_check_follow = "SELECT id FROM obserwowane WHERE idWydarzenia = $id AND idUzytkownika = $idUzytkownika";
+            $result_check_follow = $conn->query($sql_check_follow);
+            $is_following = $result_check_follow->num_rows > 0;
+        ?>
+
+        <?php if ($is_following): ?>
+            <form action="unfollow.php" method="POST">
+                <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                <button type="submit" class="button">Usuń z obserwowanych</button>
+            </form>
+        <?php else: ?>
+            <form action="follow.php" method="POST">
+                <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                <button type="submit" class="button">Dodaj do obserwowanych</button>
+            </form>
+        <?php endif; ?>
+        <?php endif; ?>
+
+        <div class="upload-form">
+            <h3>Udostępnij swoje zdjęcie</h3>
+            <form action="details.php?id=<?php echo $id; ?>" method="post" enctype="multipart/form-data">
+                <input type="file" name="image" required>
+                <button type="submit" class="button">Prześlij</button>
+            </form>
+        </div>
+
+        <?php if ($rola === 'admin'): ?>
+            <form action="delete_event.php" method="POST">
+                <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
+                <button type="submit" class="button">Usuń to wydarzenie</button>
+            </form>
+            <a href="edit_event.php?id=<?php echo $id; ?>" class="button">Edytuj to wydarzenie</a>
+        <?php endif; ?>
+    </div>
         <div class="main-content">
             <h2>Galeria Zdjęć</h2>
             <div class="gallery">
