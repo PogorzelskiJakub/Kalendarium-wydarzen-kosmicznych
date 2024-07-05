@@ -125,7 +125,7 @@ $result_photos = $conn->query($sql_photos);
                     <input type="hidden" name="idWydarzenia" value="<?php echo $id; ?>">
                     <button type="submit">Usuń to wydarzenie</button>
                 </form>
-                <a href="edit_event.php?id=<?php echo $id; ?>">Edytuj to wydarzenie</a>
+                <a href="edit_event.php?id=<?php echo $id; ?>" class="button">Edytuj to wydarzenie</a>
             <?php endif; ?>
         </div>
         <div class="main-content">
