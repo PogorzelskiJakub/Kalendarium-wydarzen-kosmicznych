@@ -2,7 +2,6 @@
 require("session.php");
 require("db.php");
 
-// Sprawdzenie czy użytkownik jest zalogowany i jaka jest jego rola
 $rola = "";
 if(isset($_SESSION["login"])) {
     $idUzytkownika = $_SESSION["id"];

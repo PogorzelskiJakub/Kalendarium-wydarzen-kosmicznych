@@ -2,7 +2,6 @@
 require("session.php");
 require("db.php");
 
-// Obsługa usuwania propozycji
 if(isset($_POST['delete_proposal'])) {
     $id_proposal_to_delete = $_POST['delete_proposal'];
     $sql_delete = "DELETE FROM propozycje WHERE id = $id_proposal_to_delete";
@@ -13,7 +12,6 @@ if(isset($_POST['delete_proposal'])) {
     }
 }
 
-// Obsługa edycji propozycji
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_proposal'])) {
     $id = $_POST['edit_proposal'];
     $nazwa = $_POST['nazwa'];
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_proposal'])) {
     }
 }
 
-// Pobieranie oczekujących propozycji
 $idUzytkownika = $_SESSION['id'];
 $sql = "SELECT id, nazwa, kategoria, data, opis FROM propozycje WHERE status = 'Waiting' AND idUzytkownika = $idUzytkownika";
 $result = $conn->query($sql);

@@ -2,7 +2,6 @@
 require("session.php");
 require("db.php");
 
-// Pobieranie odrzuconych propozycji
 $idUzytkownika = $_SESSION['id'];
 $sql = "SELECT id, nazwa, kategoria, data, opis FROM propozycje WHERE status = 'Rejected' AND idUzytkownika = $idUzytkownika";
 $result = $conn->query($sql);

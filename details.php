@@ -2,7 +2,6 @@
 require("session.php");
 require("db.php");
 
-// Sprawdzenie czy użytkownik jest zalogowany i jaka jest jego rola
 $rola = "";
 if(isset($_SESSION["login"])) {
     $idUzytkownika = $_SESSION["id"];
@@ -33,10 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
         $fileName = uniqid() . "_" . basename($image["name"]);
         $uploadDir = "zdjęcia/";
         $targetFilePath = $uploadDir . $fileName;
-
-        // Przeniesienie pliku do katalogu zdjęcia
         if (move_uploaded_file($image["tmp_name"], $targetFilePath)) {
-            // Zapisanie informacji o zdjęciu do bazy danych (tylko nazwa pliku)
             $sql_insert = "INSERT INTO obrazy (obraz, idWydarzenia, idUzytkownika) VALUES ('$fileName', $id, $userId)";
             if ($conn->query($sql_insert) === TRUE) {
                 header("Location: details.php?id=$id");
@@ -51,15 +47,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["image"])) {
         echo "Przesłany plik nie jest obrazem.";
     }
 }
-
-// Zapytanie SQL, aby pobrać szczegółowe informacje o wydarzeniu
 $sql_event = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE id = $id";
 $result_event = $conn->query($sql_event);
 
 if ($result_event->num_rows > 0) {
     $event = $result_event->fetch_assoc();
-
-    // Zapytanie SQL, aby pobrać ilość obserwujących to wydarzenie
     $sql_followers = "SELECT COUNT(*) AS count FROM obserwowane WHERE idWydarzenia = $id";
     $result_followers = $conn->query($sql_followers);
     $followers_count = $result_followers->fetch_assoc()['count'];
@@ -69,7 +61,7 @@ if ($result_event->num_rows > 0) {
     exit();
 }
 
-// Zapytanie SQL, aby pobrać galerię zdjęć z informacją o użytkowniku
+// pobieranie galerii zdjęć z informacją o użytkowniku
 $sql_photos = "SELECT obrazy.id, obrazy.obraz, uzytkownicy.login 
                FROM obrazy 
                LEFT JOIN uzytkownicy ON obrazy.idUzytkownika = uzytkownicy.id 
@@ -186,7 +178,6 @@ $result_photos = $conn->query($sql_photos);
             <p><strong>Opis:</strong> <?php echo htmlspecialchars($event['opis']); ?></p>
             <p><strong>Ilość obserwujących:</strong> <?php echo htmlspecialchars($followers_count); ?></p>
             
-            <!-- Przyciski do dodawania i usuwania z obserwowanych -->
             <?php if (isset($_SESSION['id'])): ?>
             <?php
                 $idUzytkownika = $_SESSION['id'];

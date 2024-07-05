@@ -56,7 +56,6 @@ if (isset($_POST['change_status'])) {
     <div class="container">
         <h2>Panel Administratora</h2>
         
-        <!-- Lista propozycji do akceptacji lub odrzucenia -->
         <h3>Oczekujące propozycje</h3>
         <table>
             <thead>

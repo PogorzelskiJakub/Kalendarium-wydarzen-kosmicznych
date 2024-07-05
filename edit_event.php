@@ -25,8 +25,6 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-
-// Pobranie istniejących danych wydarzenia
 $sql_event = "SELECT nazwa, kategoria, data, opis FROM wydarzenia WHERE id = $id";
 $result_event = $conn->query($sql_event);
 
@@ -37,8 +35,6 @@ if ($result_event->num_rows > 0) {
     header("Location: list.php");
     exit();
 }
-
-// Obsługa przesyłania formularza edycji
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $nazwa = $_POST["nazwa"];
     $kategoria = $_POST["kategoria"];
