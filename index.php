@@ -10,7 +10,7 @@ require("db.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalendarz Wydarzeń Kosmicznych</title>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_kalendar.css">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 </head>
 <body>
