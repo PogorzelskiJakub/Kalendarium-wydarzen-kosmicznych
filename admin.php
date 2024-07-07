@@ -46,9 +46,7 @@ if (isset($_POST['change_status'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administratora</title>
-    <style>
-        /* Styl CSS */
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <?php include 'menu.php'; ?>
