@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Logowanie</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <?php
@@ -19,7 +19,7 @@
             $user = $result->fetch_object();
             $_SESSION["login"] = $login;
             $_SESSION["id"] = $user->id;
-    header("Location: index.php");
+            header("Location: index.php");
         } else {
             echo "<div class='form'>
                   <h3>Nieprawidłowy login lub hasło.</h3><br/>
@@ -28,13 +28,15 @@
         }
     } else {
     ?>
-    <form class="form" method="post" name="login">
-        <h1 class="login-title">Logowanie</h1>
-        <input type="text" class="login-input" name="login" placeholder="Login" autofocus="true"/>
-        <input type="password" class="login-input" name="haslo" placeholder="Hasło"/>
-        <input type="submit" value="Zaloguj" name="submit" class="login-button"/>
-        <p class="link"><a href="registration.php">Zarejestruj się</a></p>
-    </form>
+    <div class="login-container">
+        <form class="form" method="post" name="login">
+            <h1 class="login-title">Logowanie</h1>
+            <input type="text" class="login-input" name="login" placeholder="Login" autofocus="true"/>
+            <input type="password" class="login-input" name="haslo" placeholder="Hasło"/>
+            <input type="submit" value="Zaloguj" name="submit" class="login-button"/>
+            <p class="link"><a href="registration.php">Zarejestruj się</a></p>
+        </form>
+    </div>
     <?php
     }
     ?>

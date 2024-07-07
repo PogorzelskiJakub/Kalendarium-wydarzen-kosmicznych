@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Rejestracja</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <?php
@@ -27,13 +27,15 @@
         }
     } else {
     ?>
-    <form class="form" action="" method="post">
-        <h1 class="login-title">Rejestracja</h1>
-        <input type="text" class="login-input" name="login" placeholder="Login" required/>
-        <input type="password" class="login-input" name="haslo" placeholder="Hasło" required/>
-        <input type="submit" name="submit" value="Zarejestruj się" class="login-button">
-        <p class="link"><a href="login.php">Zaloguj się</a></p>
-    </form>
+    <div class="login-container">
+        <form class="form" action="" method="post">
+            <h1 class="login-title">Rejestracja</h1>
+            <input type="text" class="login-input" name="login" placeholder="Login" required/>
+            <input type="password" class="login-input" name="haslo" placeholder="Hasło" required/>
+            <input type="submit" name="submit" value="Zarejestruj się" class="login-button">
+            <p class="link"><a href="login.php">Zaloguj się</a></p>
+        </form>
+    </div>
     <?php
     }
     ?>

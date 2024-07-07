@@ -295,3 +295,55 @@ td:last-child:hover {
 .follow:hover {
     text-decoration: underline;
 }
+.login-container {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.login-title {
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+.login-input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+.link {
+    margin-top: 20px;
+}
+
+.link a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link a:hover {
+    text-decoration: underline;
+}
+.form {
+    width: 300px;
+    margin: 0 auto;
+}
