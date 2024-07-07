@@ -11,9 +11,11 @@ body {
 
 .container {
     width: 80%;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 .sidebar {
@@ -212,4 +214,84 @@ body {
     color: #bbb;
     text-decoration: none;
     cursor: pointer;
+}
+h2 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.search-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.search-form label {
+    margin-right: 10px;
+}
+
+.search-form input[type="text"],
+.search-form select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.search-form button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+td:last-child {
+    cursor: pointer;
+}
+
+td:last-child:hover {
+    background-color: #e0e0e0;
+}
+
+.follow {
+    color: #fc0000;  /* Zmieniono kolor tekstu */
+    cursor: pointer;
+}
+
+.follow:hover {
+    text-decoration: underline;
 }
